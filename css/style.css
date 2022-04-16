@@ -1,0 +1,118 @@
+* {
+    border: 0;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    height: 100vh;
+}
+
+body {
+    font-family: 'Roboto', sans-serif;
+    display: flex;
+    align-items: center;
+    height: 100%;
+}
+
+p {
+    font-size: 18px;
+    font-weight: 400;
+}
+
+.container {
+    width: 500px;
+    margin: 0 auto;
+}
+
+.container h3 {
+    margin-bottom: 20px;
+}
+
+.converstioncash {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    border: 1px solid #ccc;
+    border-radius: 20px;
+    padding: 15px;
+    align-items: end;
+}
+
+input,
+select {
+    border: 1px solid #ccc;
+    padding: 5px 10px;
+    border-radius: 5px;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    -ms-border-radius: 5px;
+    -o-border-radius: 5px;
+    cursor: pointer;
+}
+
+.selectMoedas div {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.imgConvertion {
+    display: block;
+    justify-items: center;
+    margin: 20px;
+}
+
+.imgConvertion img {
+    width: 150px;
+}
+
+.setMOedas {
+    flex-direction: column;
+    row-gap: 20px;
+}
+
+label span {
+    margin-right: 15px;
+}
+
+.totalCash {
+    border: 1px solid #1d7821;
+    background: #1d7821;
+    padding: 5px 15px;
+    color: #fff;
+    border-radius: 5px;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    -ms-border-radius: 5px;
+    -o-border-radius: 5px;
+    display: block;
+    text-align: right;
+    gap: 10px;
+}
+
+a {
+    padding: 10px 15px;
+    display: inline-block;
+    background: #201e1e;
+    margin: 10px 0;
+    border-radius: 5px;
+    color: #fff;
+    text-decoration: none;
+    text-align: right;
+}
+
+@media (min-width: 320px) and (max-width:760px) {
+    .container {
+        padding: 15px;
+    }
+    .converstioncash {
+        justify-content: center;
+    }
+    .totalCash {
+        width: 100%;
+    }
+}

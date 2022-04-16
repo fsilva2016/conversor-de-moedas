@@ -1,19 +1,53 @@
 "use strict";
 
-function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
-
-function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(source, true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(source).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
-
-function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-
 var currencyOneEl = document.querySelector('[data-js="currency-one"]');
 var currencyTwoEl = document.querySelector('[data-js="currency-two"]');
 var currenciesEl = document.querySelector('[data-js="currencies-container"]');
 var convertedValueEl = document.querySelector('[data-js="converted-value"]');
 var valuePrecisionEl = document.querySelector('[data-js="conversion-precision"]');
 var timesCurrencyOneEl = document.querySelector('[data-js="currency-one-times"]');
-var internalExchangeRate = {};
-var url = 'https://v6.exchangerate-api.com/v6/7b1d2a1ed460dc816905c9db/latest/USD';
+
+var showAlert = function showAlert(err) {
+  var div = document.createElement('div');
+  var button = document.createElement('button');
+  div.textContent = err.message;
+  div.classList.add('alert', 'alert-warning', 'alert-dismissible', 'fade', 'show');
+  div.setAttribute('role', 'alert');
+  button.classList.add('btn-close');
+  button.setAttribute('type', 'button');
+  button.setAttribute('aria-label', 'close');
+  button.addEventListener('click', function () {
+    div.remove();
+  });
+  div.appendChild(button);
+  currenciesEl.insertAdjacentElement('afterend', div);
+};
+
+var state = function () {
+  var exchangeRate = {};
+  return {
+    getExchangeRate: function getExchangeRate() {
+      return exchangeRate;
+    },
+    setExchangerRate: function setExchangerRate(newExchangerRate) {
+      if (!newExchangerRate.conversion_rates) {
+        showAlert({
+          message: 'O objeto nao tem uma propriedade convertion_rates'
+        });
+        return;
+      }
+
+      exchangeRate = newExchangerRate;
+      return exchangeRate;
+    }
+  };
+}();
+
+var APIKey = '7b1d2a1ed460dc816905c9db';
+
+var getUrl = function getUrl(currency) {
+  return "https://v6.exchangerate-api.com/v6/".concat(APIKey, "/latest/").concat(currency);
+};
 
 var getErrormessage = function getErrormessage(errorType) {
   return {
@@ -27,8 +61,8 @@ var getErrormessage = function getErrormessage(errorType) {
   }[errorType] || ' nao foi possivel obter as informações';
 };
 
-var fetchExchangerRate = function fetchExchangerRate() {
-  var response, exchangeRateData, div, button;
+var fetchExchangerRate = function fetchExchangerRate(url) {
+  var response, exchangeRateData, erroMessenger;
   return regeneratorRuntime.async(function fetchExchangerRate$(_context) {
     while (1) {
       switch (_context.prev = _context.next) {
@@ -55,65 +89,82 @@ var fetchExchangerRate = function fetchExchangerRate() {
           exchangeRateData = _context.sent;
 
           if (!(exchangeRateData.result === 'error')) {
-            _context.next = 11;
+            _context.next = 12;
             break;
           }
 
-          throw new Error(getErrormessage(exchangeRateData['error-type']));
+          erroMessenger = getErrormessage(exchangeRateData['error-type']);
+          throw new Error(erroMessenger);
 
-        case 11:
-          return _context.abrupt("return", exchangeRateData);
+        case 12:
+          return _context.abrupt("return", state.setExchangerRate(exchangeRateData));
 
-        case 14:
-          _context.prev = 14;
+        case 15:
+          _context.prev = 15;
           _context.t0 = _context["catch"](0);
-          div = document.createElement('div');
-          button = document.createElement('button');
-          div.textContent = _context.t0.message;
-          div.classList.add('alert', 'alert-warning', 'alert-dismissible', 'fade', 'show');
-          div.setAttribute('role', 'alert');
-          button.classList.add('btn-close');
-          button.setAttribute('type', 'button');
-          button.setAttribute('aria-label', 'close');
-          button.addEventListener('click', function () {
-            div.remove();
-          });
-          div.appendChild(button);
-          currenciesEl.insertAdjacentElement('afterend', div);
+          showAlert(_context.t0);
 
-        case 27:
+        case 18:
         case "end":
           return _context.stop();
       }
     }
-  }, null, null, [[0, 14]]);
+  }, null, null, [[0, 15]]);
+};
+
+var getOptions = function getOptions(selectedCurrency, conversion_rates) {
+  var setSelectedAttribute = function setSelectedAttribute(currency) {
+    return currency === selectedCurrency ? 'selected' : '';
+  };
+
+  return Object.keys(conversion_rates).map(function (currency) {
+    return "<option ".concat(setSelectedAttribute(currency), ">").concat(currency, "</option>");
+  }).join(' ');
+};
+
+var getMultipliedExchangeRate = function getMultipliedExchangeRate(conversion_rates) {
+  var currencyTwo = conversion_rates[currencyTwoEl.value];
+  return (timesCurrencyOneEl.value * currencyTwo).toFixed(2).replace('.', ',');
+};
+
+var getNotRoundedExchangeRate = function getNotRoundedExchangeRate(conversion_rates) {
+  var currencyTwo = conversion_rates[currencyTwoEl.value];
+  return "1 ".concat(currencyOneEl.value, " = ").concat(1 * currencyTwo, "  ").concat(currencyTwoEl.value);
+};
+
+var showUpdateRates = function showUpdateRates(_ref) {
+  var conversion_rates = _ref.conversion_rates;
+  convertedValueEl.textContent = getNotRoundedExchangeRate(conversion_rates);
+  valuePrecisionEl.textContent = getNotRoundedExchangeRate(conversion_rates);
+};
+
+var showInitialInfo = function showInitialInfo(_ref2) {
+  var conversion_rates = _ref2.conversion_rates;
+  currencyOneEl.innerHTML = getOptions('USD', conversion_rates);
+  currencyTwoEl.innerHTML = getOptions('BRL', conversion_rates);
+  showUpdateRates({
+    conversion_rates: conversion_rates
+  });
 };
 
 var init = function init() {
-  var exchangeRateData, getOptions;
+  var url, exchangeRate;
   return regeneratorRuntime.async(function init$(_context2) {
     while (1) {
       switch (_context2.prev = _context2.next) {
         case 0:
-          _context2.next = 2;
-          return regeneratorRuntime.awrap(fetchExchangerRate());
+          url = getUrl('USD');
+          _context2.next = 3;
+          return regeneratorRuntime.awrap(fetchExchangerRate(url));
 
-        case 2:
-          exchangeRateData = _context2.sent;
-          internalExchangeRate = _objectSpread({}, exchangeRateData);
+        case 3:
+          exchangeRate = _context2.sent;
 
-          getOptions = function getOptions(selectedCurrency) {
-            return Object.keys(exchangeRateData.conversion_rates).map(function (currency) {
-              return "<option ".concat(currency === selectedCurrency ? 'selected' : '', ">").concat(currency, "</option>");
-            }).join(' ');
-          };
+          if (exchangeRate && exchangeRate.conversion_rates) {
+            showInitialInfo(exchangeRate);
+          }
 
-          currencyOneEl.innerHTML = getOptions('USD');
-          currencyTwoEl.innerHTML = getOptions('BRL');
-          convertedValueEl.textContent = "R$ ".concat(exchangeRateData.conversion_rates.BRL.toFixed(2).replace('.', ','), " ");
-          valuePrecisionEl.textContent = " 1 USD = ".concat(exchangeRateData.conversion_rates.BRL, " BRL ");
-
-        case 9:
+        case 5:
         case "end":
           return _context2.stop();
       }
@@ -122,12 +173,34 @@ var init = function init() {
 };
 
 timesCurrencyOneEl.addEventListener('input', function (e) {
-  console.log(internalExchangeRate);
-  convertedValueEl.textContent = (e.target.value * internalExchangeRate.conversion_rates[currencyTwoEl.value]).toFixed(2).replace('.', ',');
+  var _state$getExchangeRat = state.getExchangeRate(),
+      conversion_rates = _state$getExchangeRat.conversion_rates;
+
+  convertedValueEl.textContent = getMultipliedExchangeRate(conversion_rates);
 });
-currencyTwoEl.addEventListener('input', function (e) {
-  var currencyTwoValue = internalExchangeRate.conversion_rates[e.target.value];
-  convertedValueEl.textContent = (timesCurrencyOneEl.value * currencyTwoValue).toFixed(2);
-  valuePrecisionEl.textContent = " 1 USD = ".concat(1 * internalExchangeRate.conversion_rates[currencyTwoValue.value], " ").concat(currencyTwoEl.value);
+currencyTwoEl.addEventListener('input', function () {
+  var exchangeRate = state.getExchangeRate();
+  showUpdateRates(exchangeRate);
+});
+currencyOneEl.addEventListener('input', function _callee(e) {
+  var url, exchangeRate;
+  return regeneratorRuntime.async(function _callee$(_context3) {
+    while (1) {
+      switch (_context3.prev = _context3.next) {
+        case 0:
+          url = getUrl(e.target.value);
+          _context3.next = 3;
+          return regeneratorRuntime.awrap(fetchExchangerRate(url));
+
+        case 3:
+          exchangeRate = _context3.sent;
+          showUpdateRates(exchangeRate);
+
+        case 5:
+        case "end":
+          return _context3.stop();
+      }
+    }
+  });
 });
 init();
