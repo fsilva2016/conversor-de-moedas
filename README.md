@@ -3,7 +3,8 @@
 ## conteúdo dessa Atividade se da ao professor Roger Melo link da aula
 https://www.youtube.com/watch?v=ExK7mUmfdeM&list=PLpSJMw6H4PFMOJHMULTxKNOEw7g1cBuyP&index=1
 
-
+#link para Gerar Api das moedas
+https://app.exchangerate-api.com/sign-in
 
 # primeiro  projeto com consumer de Api
 # Treinamento em javascript 
