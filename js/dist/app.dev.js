@@ -6,6 +6,7 @@ var currenciesEl = document.querySelector('[data-js="currencies-container"]');
 var convertedValueEl = document.querySelector('[data-js="converted-value"]');
 var valuePrecisionEl = document.querySelector('[data-js="conversion-precision"]');
 var timesCurrencyOneEl = document.querySelector('[data-js="currency-one-times"]');
+var currencyInvert = document.querySelector('[data-js="currency-invert"]');
 
 var showAlert = function showAlert(err) {
   var div = document.createElement('div');

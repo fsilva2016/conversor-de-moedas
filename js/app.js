@@ -4,6 +4,7 @@ const currenciesEl = document.querySelector('[data-js="currencies-container"]');
 const convertedValueEl = document.querySelector('[data-js="converted-value"]');
 const valuePrecisionEl = document.querySelector('[data-js="conversion-precision"]');
 const timesCurrencyOneEl = document.querySelector('[data-js="currency-one-times"]');
+const currencyInvert = document.querySelector('[data-js="currency-invert"]');
 
 const showAlert = (err) => {
     const div = document.createElement('div');
@@ -122,5 +123,6 @@ currencyOneEl.addEventListener('input', async e => {
     const exchangeRate = await fetchExchangerRate(url)
     showUpdateRates(exchangeRate);
 })
+
 
 init();
